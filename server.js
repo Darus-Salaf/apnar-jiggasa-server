@@ -34,6 +34,13 @@ client.connect(err => {
     -----------------
     */
     // Get all posts for likhito-proshno, nari-ongon & nastikkobad
+    app.get('/api/v1/posts', (req, res) => {
+
+        postsCollection.find()
+            .toArray((err, result) => res.send(result))
+    })
+
+    // Get all posts for likhito-proshno, nari-ongon & nastikkobad
     app.get('/api/v1/posts/:cat/:subcat', (req, res) => {
         const cat = req.params.cat
         const subcat = req.params.subcat
@@ -145,6 +152,7 @@ client.connect(err => {
 
     // Delete a question 
     app.delete('/api/v1/delete/question/:id', (req, res) => {
+
         questionsCollection.deleteOne({ _id: ObjectId(req.params.id) })
             .then((err, result) => res.send(result.deletedCount))
     })
@@ -187,6 +195,7 @@ client.connect(err => {
 
     // Delete a pdf 
     app.delete('/api/v1/delete/pdf/:id', (req, res) => {
+        
         pdfCollection.deleteOne({ _id: ObjectId(req.params.id) })
             .then((err, result) => res.send(result.deletedCount))
     })
