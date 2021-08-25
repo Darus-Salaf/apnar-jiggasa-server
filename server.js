@@ -195,9 +195,32 @@ client.connect(err => {
 
     // Delete a pdf 
     app.delete('/api/v1/delete/pdf/:id', (req, res) => {
-        
+
         pdfCollection.deleteOne({ _id: ObjectId(req.params.id) })
             .then((err, result) => res.send(result.deletedCount))
+    })
+
+    /* 
+    -----------------
+    PDF
+    -----------------
+    */
+    // Login for Admin
+    app.get('/api/v1/admin/login', (req, res) => {
+
+        let email = req.body.email
+        let password = req.body.password
+        let code = req.body.code
+
+        login.find({ email, password, code })
+
+            .toArray((err, result) => {
+                if (err) {
+                    res.send(err)
+                } else if (result.length) {
+                    res.sendStatus(200)
+                } else res.sendStatus(404)
+            })
     })
 
 
