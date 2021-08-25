@@ -27,6 +27,7 @@ client.connect(err => {
     const videosCollection = client.db("apnarJiggasa").collection("videos")
     const questionsCollection = client.db("apnarJiggasa").collection("questions")
     const pdfCollection = client.db("apnarJiggasa").collection("pdf")
+    const adminCollection = client.db("apnarJiggasa").collection("admins")
 
     /* 
     -----------------
@@ -212,7 +213,7 @@ client.connect(err => {
         let password = req.body.password
         let code = req.body.code
 
-        login.find({ email, password, code })
+        adminCollection.find({ email, password, code })
 
             .toArray((err, result) => {
                 if (err) {
