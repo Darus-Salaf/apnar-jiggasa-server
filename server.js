@@ -206,7 +206,7 @@ client.connect(err => {
     -----------------
     */
     // Login for Admin
-    app.get('/api/v1/admin/login', (req, res) => {
+    app.post('/api/v1/admin/login', (req, res) => {
 
         let email = req.body.email
         let password = req.body.password
