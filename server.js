@@ -35,14 +35,14 @@ client.connect(err => {
     -----------------
     */
     // Get all posts for likhito-proshno, nari-ongon & nastikkobad
-    app.get('/api/v1/posts', (req, res) => {
+    app.get('/backend/api/v1/posts', (req, res) => {
 
         postsCollection.find()
             .toArray((err, result) => res.send(result))
     })
 
     // Get all posts for likhito-proshno, nari-ongon & nastikkobad
-    app.get('/api/v1/posts/:cat/:subcat', (req, res) => {
+    app.get('/backend/api/v1/posts/:cat/:subcat', (req, res) => {
         const cat = req.params.cat
         const subcat = req.params.subcat
 
@@ -51,7 +51,7 @@ client.connect(err => {
     })
 
     // Create a post corresponding to a specific category and subcategory
-    app.post('/api/v1/create/post', (req, res) => {
+    app.post('/backend/api/v1/create/post', (req, res) => {
         const post = req.body
 
         postsCollection.insertOne(post)
@@ -59,17 +59,25 @@ client.connect(err => {
     })
 
     // Create many post
-    app.post('/api/v1/create/posts', (req, res) => {
+    app.post('/backend/api/v1/create/posts', (req, res) => {
         const post = req.body
 
         postsCollection.insertMany(post)
             .then((err, result) => err ? res.send(err) : res.send(result.insertedCount))
     })
+    // Update a post
+    app.post('/backend/api/v1/update/post', (req, res) => {
+        const id = req.body.id
+        const topic = req.body.topic
+        const answer = req.body.answer
+        postsCollection.updateOne({ _id: ObjectId(id) }, { $set: { topic, answer } })
+            .then((err, result) => err ? res.send(err.message) : res.send(result))
+    })
 
     // Delete a post 
-    app.delete('/api/v1/delete/post/:id', (req, res) => {
+    app.delete('/backend/api/v1/delete/post/:id', (req, res) => {
         postsCollection.deleteOne({ _id: ObjectId(req.params.id) })
-            .then((err, result) => res.send(result.deletedCount))
+            .then((err, result) => res.send(result))
     })
 
     /* 
@@ -78,14 +86,14 @@ client.connect(err => {
     -----------------
     */
     // Get all videos
-    app.get('/api/v1/videos', (req, res) => {
+    app.get('/backend/api/v1/videos', (req, res) => {
 
         videosCollection.find()
             .toArray((err, result) => res.send(result))
     })
 
     // Get all videos corresponding to a specific category
-    app.get('/api/v1/videos/:cat', (req, res) => {
+    app.get('/backend/api/v1/videos/:cat', (req, res) => {
         const cat = req.params.cat
 
         videosCollection.find({ cat })
@@ -93,7 +101,7 @@ client.connect(err => {
     })
 
     /*     // Get videos corresponding to a specific Sheikh
-        app.get('/api/v1/videos/:sheikh', (req, res) => {
+        app.get('/backend/api/v1/videos/:sheikh', (req, res) => {
             const sheikh = req.params.sheikh
     
             videosCollection.find({ sheikh })
@@ -101,7 +109,7 @@ client.connect(err => {
         }) */
 
     // Create a video 
-    app.post('/api/v1/create/video', (req, res) => {
+    app.post('/backend/api/v1/create/video', (req, res) => {
         const video = req.body
 
         videosCollection.insertOne(video)
@@ -109,7 +117,7 @@ client.connect(err => {
     })
 
     // Create many video 
-    app.post('/api/v1/create/videos', (req, res) => {
+    app.post('/backend/api/v1/create/videos', (req, res) => {
         const video = req.body
 
         videosCollection.insertMany(video)
@@ -117,9 +125,9 @@ client.connect(err => {
     })
 
     // Delete a video 
-    app.delete('/api/v1/delete/video/:id', (req, res) => {
+    app.delete('/backend/api/v1/delete/video/:id', (req, res) => {
         videosCollection.deleteOne({ _id: ObjectId(req.params.id) })
-            .then((err, result) => res.send(result.deletedCount))
+            .then((err, result) => res.send(result))
     })
 
     /* 
@@ -128,34 +136,46 @@ client.connect(err => {
     -----------------
     */
     // Create a question 
-    app.post('/api/v1/create/question', (req, res) => {
+    app.post('/backend/api/v1/create/question', (req, res) => {
         const question = req.body
 
         questionsCollection.insertOne(question)
             .then((err, result) => err ? res.send(err) : res.send(result.insertedCount))
     })
 
-    // Get temporary question
-    app.get('/api/v1/questions/temp', (req, res) => {
-        const status = 'temp'
-
-        questionsCollection.find({ status })
+    // Get all question 
+    app.get('/backend/api/v1/questions', (req, res) => {
+        questionsCollection.find()
             .toArray((err, result) => res.send(result))
     })
 
-    // Get permanent question
-    app.get('/api/v1/questions/per', (req, res) => {
-        const status = 'per'
+    // // Get temporary question
+    // app.get('/backend/api/v1/questions/temp', (req, res) => {
+    //     const status = 'temp'
 
-        questionsCollection.find({ status })
-            .toArray((err, result) => res.send(result))
+    //     questionsCollection.find({ status })
+    //         .toArray((err, result) => res.send(result))
+    // })
+
+    // // Get permanent question
+    // app.get('/backend/api/v1/questions/per', (req, res) => {
+    //     const status = 'per'
+
+    //     questionsCollection.find({ status })
+    //         .toArray((err, result) => res.send(result))
+    // })
+    // Update a question to permanent
+    app.get('/backend/api/v1/update/question/:id', (req, res) => {
+
+        questionsCollection.updateOne({ _id: ObjectId(req.params.id) }, { $set: { status: 'per' } })
+            .then((err, result) => err ? res.send(err.message) : res.send(result))
     })
 
     // Delete a question 
-    app.delete('/api/v1/delete/question/:id', (req, res) => {
+    app.delete('/backend/api/v1/delete/question/:id', (req, res) => {
 
         questionsCollection.deleteOne({ _id: ObjectId(req.params.id) })
-            .then((err, result) => res.send(result.deletedCount))
+            .then((err, result) => res.send(result))
     })
 
     /* 
@@ -164,14 +184,14 @@ client.connect(err => {
     -----------------
     */
     // Get all pdfs
-    app.get('/api/v1/pdfs', (req, res) => {
+    app.get('/backend/api/v1/pdfs', (req, res) => {
 
         pdfCollection.find()
             .toArray((err, result) => res.send(result))
     })
 
     // Get all pdfs corresponding to a specific category
-    app.get('/api/v1/pdfs/:cat', (req, res) => {
+    app.get('/backend/api/v1/pdfs/:cat', (req, res) => {
         const cat = req.params.cat
 
         pdfCollection.find({ cat })
@@ -179,7 +199,7 @@ client.connect(err => {
     })
 
     // Create a PDF 
-    app.post('/api/v1/create/pdf', (req, res) => {
+    app.post('/backend/api/v1/create/pdf', (req, res) => {
         const pdf = req.body
 
         pdfCollection.insertOne(pdf)
@@ -187,7 +207,7 @@ client.connect(err => {
     })
 
     // Create many PDF 
-    app.post('/api/v1/create/pdfs', (req, res) => {
+    app.post('/backend/api/v1/create/pdfs', (req, res) => {
         const pdf = req.body
 
         pdfCollection.insertMany(pdf)
@@ -195,10 +215,10 @@ client.connect(err => {
     })
 
     // Delete a pdf 
-    app.delete('/api/v1/delete/pdf/:id', (req, res) => {
+    app.delete('/backend/api/v1/delete/pdf/:id', (req, res) => {
 
         pdfCollection.deleteOne({ _id: ObjectId(req.params.id) })
-            .then((err, result) => res.send(result.deletedCount))
+            .then((err, result) => res.send(result))
     })
 
     /* 
@@ -207,7 +227,7 @@ client.connect(err => {
     -----------------
     */
     // Login for Admin
-    app.post('/api/v1/admin/login', (req, res) => {
+    app.post('/backend/api/v1/admin/login', (req, res) => {
 
         let email = req.body.email
         let password = req.body.password
