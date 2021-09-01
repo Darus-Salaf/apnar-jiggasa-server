@@ -157,18 +157,40 @@ client.connect(err => {
     //         .toArray((err, result) => res.send(result))
     // })
 
-    // // Get permanent question
-    // app.get('/backend/api/v1/questions/per', (req, res) => {
-    //     const status = 'per'
+    // Get all permanent questions
+    app.get('/backend/api/v1/questions/per', (req, res) => {
+        const status = 'per'
 
-    //     questionsCollection.find({ status })
-    //         .toArray((err, result) => res.send(result))
-    // })
+        questionsCollection.find({ status })
+            .toArray((err, result) => res.send(result))
+    })
+    // Get a single permanent question
+    app.get('/backend/api/v1/questions/per/:id', (req, res) => {
+
+        questionsCollection.find({ _id: ObjectId(req.params.id) })
+            .toArray((err, result) => res.send(result))
+    })
+
     // Update a question to permanent
-    app.get('/backend/api/v1/update/question/:id', (req, res) => {
+    app.post('/backend/api/v1/update/question', (req, res) => {
+        const id = req.body.id
+        const answer = req.body.answer
 
-        questionsCollection.updateOne({ _id: ObjectId(req.params.id) }, { $set: { status: 'per' } })
+        questionsCollection.updateOne({ _id: ObjectId(id) }, { $set: { status: 'per', answer } })
             .then((err, result) => err ? res.send(err.message) : res.send(result))
+    })
+
+    // Post a comment to a permanent question
+    app.post('/backend/api/v1/comment', (req, res) => {
+        let id = req.body.id
+        let comment = req.body.comment
+
+        questionsCollection.findOneAndUpdate({ _id: ObjectId(id) }, {
+            $push: { comments: comment }
+        })
+            .then(result => res.sendStatus(200))
+            .catch(err => res.send(err.message))
+
     })
 
     // Delete a question 
