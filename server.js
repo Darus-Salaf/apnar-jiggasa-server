@@ -288,7 +288,11 @@ client.connect(err => {
             .toArray((err, result) => res.send(result))
     })
 
-
+    // Delete a Comment Report
+    app.delete('/backend/api/v1/delete/report/:id', (req, res) => {
+        reportCollection.deleteOne({ _id: ObjectId(req.params.id) })
+            .then((err, result) => res.send(result))
+    })
 
 })
 
