@@ -28,6 +28,7 @@ client.connect(err => {
     const questionsCollection = client.db("apnarJiggasa").collection("questions")
     const pdfCollection = client.db("apnarJiggasa").collection("pdf")
     const adminCollection = client.db("apnarJiggasa").collection("admins")
+    const reportCollection = client.db("apnarJiggasa").collection("reports")
 
     /* 
     -----------------
@@ -265,6 +266,28 @@ client.connect(err => {
                 } else res.sendStatus(404)
             })
     })
+    /* 
+    -----------------
+    Report
+    -----------------
+    */
+    // Create a Comment Report 
+    app.post('/backend/api/v1/report/comment', (req, res) => {
+        const report = {
+            id: req.body.id,
+            comment: req.body.comment
+        }
+
+        reportCollection.insertOne(report)
+            .then((err, result) => err ? res.send(err) : res.send(result.insertedCount))
+    })
+
+    // Get all the Comment Reports
+    app.get('/backend/api/v1/report/comments', (req, res) => {
+        reportCollection.find()
+            .toArray((err, result) => res.send(result))
+    })
+
 
 
 })
