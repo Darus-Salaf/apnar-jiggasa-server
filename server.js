@@ -29,6 +29,8 @@ client.connect(err => {
     const pdfCollection = client.db("apnarJiggasa").collection("pdf")
     const adminCollection = client.db("apnarJiggasa").collection("admins")
     const reportCollection = client.db("apnarJiggasa").collection("reports")
+    const duaCollection = client.db("apnarJiggasa").collection("dua")
+    const duaNameCollection = client.db("apnarJiggasa").collection("duaname")
 
     /* 
     -----------------
@@ -292,6 +294,23 @@ client.connect(err => {
     app.delete('/backend/api/v1/delete/report/:id', (req, res) => {
         reportCollection.deleteOne({ _id: ObjectId(req.params.id) })
             .then((err, result) => res.send(result))
+    })
+
+    /* 
+    -----------------
+    Dua
+    -----------------
+    */
+
+    // Get all dua
+    app.get('/backend/api/v1/dua', (req, res) => {
+        duaCollection.find()
+            .toArray((err, result) => res.send(result))
+    })
+    // Get all dua name
+    app.get('/backend/api/v1/duaname', (req, res) => {
+        duaNameCollection.find()
+            .toArray((err, result) => res.send(result))
     })
 
 })
