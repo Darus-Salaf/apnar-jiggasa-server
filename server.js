@@ -4,6 +4,7 @@ const MongoClient = require('mongodb').MongoClient
 const ObjectId = require('mongodb').ObjectId
 const cors = require('cors')
 const bodyParser = require('body-parser')
+const jwt = require('jsonwebtoken')
 
 require('dotenv').config()
 
@@ -28,6 +29,7 @@ client.connect(err => {
     const questionsCollection = client.db("apnarJiggasa").collection("questions")
     const pdfCollection = client.db("apnarJiggasa").collection("pdf")
     const adminCollection = client.db("apnarJiggasa").collection("admins")
+    const moderatorCollection = client.db("apnarJiggasa").collection("moderators")
     const reportCollection = client.db("apnarJiggasa").collection("reports")
     const duaCollection = client.db("apnarJiggasa").collection("dua")
     const duaNameCollection = client.db("apnarJiggasa").collection("duaname")
@@ -248,9 +250,10 @@ client.connect(err => {
 
     /* 
     -----------------
-    PDF
+    Auth
     -----------------
     */
+
     // Login for Admin
     app.post('/backend/api/v1/admin/login', (req, res) => {
 
@@ -264,10 +267,76 @@ client.connect(err => {
                 if (err) {
                     res.send(err)
                 } else if (result.length) {
-                    res.sendStatus(200)
-                } else res.sendStatus(404)
+                    const token = jwt.sign({
+                        email,
+                        password,
+                        code
+                    }, process.env.JWT_SECRET)
+                    res.status(200).json({
+                        "access_token": token
+                    })
+                } else res.status(401).json({
+                    "error": "Authentication failed!"
+                })
             })
     })
+
+    // Login for Moderator
+    app.post('/backend/api/v1/moderator/login', (req, res) => {
+
+        let email = req.body.email
+        let password = req.body.password
+
+        moderatorCollection.find({ email, password })
+
+            .toArray((err, result) => {
+                if (err) {
+                    res.send(err)
+                } else if (result.length) {
+                    const token = jwt.sign({
+                        email,
+                        password
+                    }, process.env.JWT_SECRET)
+                    res.status(200).json({
+                        "access_token": token,
+                        "hash": process.env.JWT_SECRET
+                    })
+                } else res.status(401).json({
+                    "error": "Authentication failed!"
+                })
+            })
+    })
+
+    // Increase a post number by moderator
+    app.get('/backend/api/v1/moderator/:id/post/:title', (req, res) => {
+        let title = req.params.title
+        let id = req.params.id
+
+        moderatorCollection.findOneAndUpdate({ email: id }, {
+            $push: { post: title }
+        })
+            .then(result => res.sendStatus(200))
+            .catch(err => res.send(err.message))
+
+    })
+    // Get a specific moderator's data
+    app.get('/backend/api/v1/moderator/:id', (req, res) => {
+        let id = req.params.id
+
+        moderatorCollection.find({ email: id })
+            .toArray((err, result) => {
+                res.status(200).json({
+                    email: result[0].email,
+                    posts: result[0].post
+                })
+            })
+    })
+    // Get all moderator's data
+    app.get('/backend/api/v1/moderators', (req, res) => {
+        moderatorCollection.find()
+            .toArray((err, result) => res.send(result))
+    })
+
     /* 
     -----------------
     Report
