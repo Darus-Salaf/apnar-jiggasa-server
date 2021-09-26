@@ -28,7 +28,9 @@ client.connect(err => {
     const questionsCollection = client.db("apnarJiggasa").collection("questions")
     const pdfCollection = client.db("apnarJiggasa").collection("pdf")
     const adminCollection = client.db("apnarJiggasa").collection("admins")
+    const reportCollection = client.db("apnarJiggasa").collection("reports")
     const duaCollection = client.db("apnarJiggasa").collection("dua")
+    const duaNameCollection = client.db("apnarJiggasa").collection("duaname")
 
     /* 
     -----------------
@@ -266,13 +268,50 @@ client.connect(err => {
                 } else res.sendStatus(404)
             })
     })
+    /* 
+    -----------------
+    Report
+    -----------------
+    */
+    // Create a Comment Report 
+    app.post('/backend/api/v1/report/comment', (req, res) => {
+        const report = {
+            id: req.body.id,
+            comment: req.body.comment
+        }
 
-    // insert many dua 
-    app.post('/dua/:dua', (req, res) => {
-        duaCollection.insertMany(req.params.dua)
-            .then((err, result) => res.send(err.message, result))
+        reportCollection.insertOne(report)
+            .then((err, result) => err ? res.send(err) : res.send(result.insertedCount))
     })
 
+    // Get all the Comment Reports
+    app.get('/backend/api/v1/report/comments', (req, res) => {
+        reportCollection.find()
+            .toArray((err, result) => res.send(result))
+    })
+
+    // Delete a Comment Report
+    app.delete('/backend/api/v1/delete/report/:id', (req, res) => {
+        reportCollection.deleteOne({ _id: ObjectId(req.params.id) })
+            .then((err, result) => res.send(result))
+    })
+
+    /* 
+    -----------------
+    Dua
+    -----------------
+    */
+
+    // Get all dua
+    app.get('/backend/api/v1/dua', (req, res) => {
+        duaCollection.find()
+            .toArray((err, result) => res.send(result))
+    })
+    // Get all dua name
+    app.get('/backend/api/v1/duaname', (req, res) => {
+        duaNameCollection.find()
+            .toArray((err, result) => res.send(result))
+    })
 
 })
 
