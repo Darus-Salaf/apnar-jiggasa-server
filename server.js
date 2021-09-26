@@ -28,6 +28,7 @@ client.connect(err => {
     const questionsCollection = client.db("apnarJiggasa").collection("questions")
     const pdfCollection = client.db("apnarJiggasa").collection("pdf")
     const adminCollection = client.db("apnarJiggasa").collection("admins")
+    const duaCollection = client.db("apnarJiggasa").collection("dua")
 
     /* 
     -----------------
@@ -264,6 +265,12 @@ client.connect(err => {
                     res.sendStatus(200)
                 } else res.sendStatus(404)
             })
+    })
+
+    // insert many dua 
+    app.post('/dua/:dua', (req, res) => {
+        duaCollection.insertMany(req.params.dua)
+            .then((err, result) => res.send(err.message, result))
     })
 
 
